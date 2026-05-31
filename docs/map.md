@@ -22,7 +22,8 @@ skill-factory/
     ├── practices/                      # refactoring, refinement-loop
     ├── ai/                             # ai-patterns, creating-process-files
     │   └── claude-code/                # creating-hooks
-    └── developer-tools/                # writing-bash-scripts, using-uv, git-worktrees
+    ├── developer-tools/                # writing-bash-scripts, using-uv, git-worktrees
+    └── productivity/                   # handoff
 ```
 
 ## Purpose
