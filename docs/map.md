@@ -24,7 +24,7 @@ skill-factory/
     │   └── claude-code/                # creating-hooks
     ├── developer-tools/                # writing-bash-scripts, using-uv, git-worktrees
     ├── productivity/                   # handoff
-    └── communication/                  # felix
+    └── communication/                  # felix, guille
 ```
 
 ## Purpose
