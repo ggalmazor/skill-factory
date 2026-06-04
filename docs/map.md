@@ -18,12 +18,13 @@ skill-factory/
 │   └── project.md                      # Project-specific information
 └── output_skills/                      # Created skills organized by category
     ├── testing/                        # tdd, nullables, approval-tests, bdd-with-approvals
-    ├── design/                         # hexagonal-architecture, event-modeling, collaborative-design
+    ├── design/                         # hexagonal-architecture, event-modeling, collaborative-design, improve-component-architecture
     ├── practices/                      # refactoring, refinement-loop
     ├── ai/                             # ai-patterns, creating-process-files
     │   └── claude-code/                # creating-hooks
     ├── developer-tools/                # writing-bash-scripts, using-uv, git-worktrees
-    └── productivity/                   # handoff
+    ├── productivity/                   # handoff
+    └── communication/                  # felix
 ```
 
 ## Purpose
