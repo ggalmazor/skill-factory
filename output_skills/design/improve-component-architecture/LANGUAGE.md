@@ -2,6 +2,8 @@
 
 Shared vocabulary for every suggestion this skill makes. Use these terms exactly - don't substitute "service," "module," "layer," or "API." Consistent language is the whole point.
 
+This is the **default** dialect. When the project ships its own architecture specifications, those are authoritative for the run and override everything here on conflict (and may add primitives this file never mentions); this glossary then governs only where the specs are silent. See [SPECIFICATIONS.md](SPECIFICATIONS.md).
+
 ## Terms
 
 **Component**

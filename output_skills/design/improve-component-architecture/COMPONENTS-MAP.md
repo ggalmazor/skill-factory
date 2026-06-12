@@ -2,6 +2,8 @@
 
 An optional project document that describes the system's components. When it exists, this skill reads it first and lets it inform every placement and ownership decision. When it's missing, the skill works without it - but proposes adding entries as new components and BTX are designed.
 
+This document is the **inventory** (which components exist); the project's **specifications** are the **rules** (what a component must be). They are separate, both optional, both read before exploring. See [SPECIFICATIONS.md](SPECIFICATIONS.md).
+
 The map is read-only guidance for the skill; the skill never silently rewrites it. It *proposes* additions during the grilling loop (Step 3), framed as "this map is missing the Pricing component - add it?".
 
 ## What the map records
