@@ -12,6 +12,7 @@
 **Priority:** high | normal | low
 **Base:** <branch this work integrates into — the task worktree branches off it and the merger merges back into it; defaults to the branch checked out when the card was created>
 **Model:** opus | sonnet  <!-- the executor's model. Default opus (favor speed / one-shot completion); use sonnet only for genuinely trivial, single-file, fully-specified work. Absent ⇒ the orchestrator defaults to sonnet for back-compat. -->
+**Verify:** <command(s) that prove the merged result is sound — compile/build/test, e.g. `./gradlew compileJava compileTestJava` or `npm test`. The merger runs this as a hard gate before deleting the worktree; on failure it rolls the merge back and blocks. Omit if the project has no quick check — the merger will then try to discover one.>
 **Scope:** <source id(s) and/or area — e.g. "source 11", "source-list UI", "all XLSX extractors">
 
 ## Problem / goal

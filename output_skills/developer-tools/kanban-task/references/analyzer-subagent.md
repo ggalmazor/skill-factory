@@ -21,7 +21,7 @@ The goal is not just a valid card — it is a **navigation brief** good enough t
 > - **Problem / goal** — what's wrong or wanted, with the "why" if non-obvious.
 > - **Done when** — testable acceptance criteria, not a restatement of the title.
 >
-> **Non-essentials** (infer; do not block on them): **Priority** (default `normal`), **Base** (see below), **Model** (see below), **Scope** (the area/ids touched), **Evidence** (for bugs — observed vs expected, errors, repro), **Pointers** (files/entry points/constraints). When you infer something non-obvious, record it under `## Assumptions` on the card. Omit a section's placeholder rather than inventing content.
+> **Non-essentials** (infer; do not block on them): **Priority** (default `normal`), **Base** (see below), **Model** (see below), **Verify** (see below), **Scope** (the area/ids touched), **Evidence** (for bugs — observed vs expected, errors, repro), **Pointers** (files/entry points/constraints). When you infer something non-obvious, record it under `## Assumptions` on the card. Omit a section's placeholder rather than inventing content.
 >
 > **Blocking vs non-blocking gaps:** if an *essential* cannot be inferred from the request and context, that is a **blocking** gap — do not write a card; return `needs_clarification` (see contract below). A missing *non-essential* is non-blocking — infer it, note the assumption, and proceed to `card_written`.
 >
@@ -31,11 +31,13 @@ The goal is not just a valid card — it is a **navigation brief** good enough t
 >
 > **Model** is the model the executor runs on. **Default `opus`** — the board favors speed and one-shot completion over token economy, and a stronger executor means fewer blocked or conflicted tasks and fewer human round-trips. Set `sonnet` **only when the task is genuinely trivial**: single-file, mechanical, fully-specified pointers, no design latitude (e.g. a rename, a constant change, a copy tweak). When in doubt, `opus`.
 >
+> **Verify** is the command the merger runs as a hard gate to prove the merged result builds before it deletes the worktree. You are already in the repo — determine the project's fast soundness check and set it: e.g. `./gradlew compileJava compileTestJava` for Gradle/Java, `npm test` or `npm run build` for Node, `cargo build` for Rust, `pytest` for Python. Prefer the quickest check that would catch a broken merge (compile over full test suite if the suite is slow). If the project has no obvious check, omit the field — the merger will try to discover one itself, and skip the gate if none exists.
+>
 > **Steps:**
 > 1. Explore the repo as needed to write concrete pointers and locate the work.
 > 2. Determine the next number `NN`: scan `tasks/todo/`, `tasks/doing/`, and `tasks/done/` for filenames starting with digits, take the highest, add one, zero-pad to two (start at `01`). Create `tasks/todo/` if absent.
 > 3. Derive a short kebab-case `slug` from the title (a few words).
-> 4. Copy the template at `${CLAUDE_SKILL_DIR}/assets/task-template.md` and fill the top half. Set **Base**, set **Model** per the rule above, set the Timeline `created:` field to the current local time (`date '+%Y-%m-%d %H:%M'`), and fill `## Assumptions` with any non-obvious inferences (or omit the section if none). Leave `dispatched`, `agent finished`, `merged`, and the entire `## Handoff` blank — execution agents own those.
+> 4. Copy the template at `${CLAUDE_SKILL_DIR}/assets/task-template.md` and fill the top half. Set **Base**, set **Model** per the rule above, set **Verify** to the project's soundness check (or omit), set the Timeline `created:` field to the current local time (`date '+%Y-%m-%d %H:%M'`), and fill `## Assumptions` with any non-obvious inferences (or omit the section if none). Leave `dispatched`, `agent finished`, `merged`, and the entire `## Handoff` blank — execution agents own those.
 > 5. Write to `tasks/todo/<NN>-<slug>.md`.
 >
 > Return per the contract below.
