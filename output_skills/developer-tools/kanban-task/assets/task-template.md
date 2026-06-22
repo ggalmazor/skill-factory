@@ -10,10 +10,15 @@
 
 **Type:** bug | feature | chore
 **Priority:** high | normal | low
+**Base:** <branch this work integrates into — the task worktree branches off it and the merger merges back into it; defaults to the branch checked out when the card was created>
+**Model:** opus | sonnet  <!-- the executor's model. Default opus (favor speed / one-shot completion); use sonnet only for genuinely trivial, single-file, fully-specified work. Absent ⇒ the orchestrator defaults to sonnet for back-compat. -->
 **Scope:** <source id(s) and/or area — e.g. "source 11", "source-list UI", "all XLSX extractors">
 
 ## Problem / goal
 <What's wrong, or what you want built. Include the "why" if it isn't obvious.>
+
+## Assumptions  (optional — filled at creation)
+<Non-obvious inferences the analyzer made when a non-essential couldn't be confirmed — e.g. "assumed Base `main`, no feature branch named". Omit if none.>
 
 ## Evidence  (bugs — optional for features)
 <Observed vs expected. Paste any error text / stack trace. Repro steps. Screenshot path.>

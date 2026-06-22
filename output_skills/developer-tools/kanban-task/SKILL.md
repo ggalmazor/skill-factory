@@ -1,6 +1,6 @@
 ---
 name: kanban-task
-description: "Creates a kanban task card in tasks/todo/ from a short description: assigns the next sequence number and fills type, priority, scope, problem, and acceptance criteria, leaving the agent-filled sections blank. Use when adding a task to the kanban board."
+description: "Turns one or more requests into well-formed kanban cards in tasks/todo/ by dispatching background Opus analyzer subagents that decompose each request, locate the work in the codebase, and write a navigation-brief card. The main agent stays a thin router: it owns the user conversation, relays any clarifying questions an analyzer needs, and never blocks on analysis. Use when adding one or several tasks to the kanban board."
 argument-hint: "[task description]"
 ---
 
@@ -8,41 +8,50 @@ STARTER_CHARACTER = 📝
 
 # Kanban task
 
-Turn a request into a well-formed kanban card in `tasks/todo/`, ready for the `kanban` skill to dispatch. The card template is `${CLAUDE_SKILL_DIR}/assets/task-template.md`.
+Turn requests into well-formed kanban cards in `tasks/todo/`, ready for the `kanban` skill to dispatch. The reasoning-heavy part — decomposing a request and locating the work in the codebase — runs on **Opus in a background analyzer subagent**, not inline on the main agent. This is what lets a queue of prompts be analyzed in parallel instead of one at a time.
 
-This analysis runs on **Opus**: decomposing a request and locating the work in the codebase is the reasoning-heavy step. The card it produces is then executed by a **Sonnet** subagent that the `kanban` orchestrator spawns. So the goal here is not just a valid card — it is a *navigation brief* good enough that a Sonnet agent can act on it without re-deriving scope or hunting for entry points. Front-load that work now, while on the stronger model. If you must explore the repo to write concrete pointers, do it before writing the card.
+## Your role: router, not analyst
 
-## Inputs
+You (the main agent) do almost no analysis here. You:
 
-Take the task from `$ARGUMENTS` and the surrounding conversation. Fill what you can infer; these are essential and must not be guessed:
+1. **Dispatch** one Opus analyzer subagent per pending request (see [references/analyzer-subagent.md](references/analyzer-subagent.md) for its prompt and return contract). When several requests are pending, dispatch them **concurrently in a single message** so they analyze in parallel — this is the whole point.
+2. **Route returns.** Each analyzer returns one of two verdicts:
+   - `card_written` — the analyzer already wrote the card to `tasks/todo/`. Acknowledge it to the user with the path, one-line summary, and any assumptions it recorded. Nothing else to do.
+   - `needs_clarification` — the analyzer hit a *blocking* gap (an essential it could not infer) and wrote **nothing** to the board. It returns questions pre-shaped for `AskUserQuestion`. Relay them to the user, collect the answers, then **resume that same analyzer** with `SendMessage` (by its agent id/name) carrying the answers. The analyzer finishes the card with its context intact and returns `card_written`.
+3. **Ensure the board is running** once cards exist (see Steps below).
 
-- **Title** — short, imperative.
-- **Type** — bug, feature, or chore.
-- **Problem / goal** — what's wrong or wanted, with the "why" if non-obvious.
-- **Done when** — acceptance criteria.
+You never explore the repo or write a card yourself. The only user-facing conversation — clarifying questions — stays with you because a background subagent cannot prompt the user.
 
-If any essential is missing and cannot be inferred from context, ask the user — batch all gaps into a single round of questions rather than drip-asking, and proceed once answered. Don't block on the non-essentials: infer **Priority** (default `normal`), **Scope** (the area/ids touched), **Evidence** (for bugs — observed vs expected, errors, repro), and **Pointers** (known files/constraints), and omit a section's placeholder rather than inventing content.
+## Why this split
 
-**Pointers and Scope are the Sonnet executor's map** — invest here. Name concrete files and the entry points within them (path, function/class, and why it's relevant), the pattern or sibling implementation to mirror, and any constraint that bounds the change. A pointer that says `src/extractors/xlsx.py — extract_rows(), row loop drops empty cells` saves the subagent an exploration pass; `the extractor code` does not. The more precisely the change is located now, the less a Sonnet agent has to rediscover at execution time.
+A background analyzer cannot ask the user a question; its final message returns to you as a tool result, invisible to the user. So the analyzer **returns** its questions instead of asking them, and you do the asking. That keeps the human loop on the main agent while N analyzers churn in the background, and it keeps incomplete cards off the board entirely — a card only ever lands in `todo/` when it is complete and dispatchable.
+
+## Clarification round-trip
+
+For a request with blocking gaps:
+
+1. You dispatch the analyzer. It explores, classifies each gap as **blocking** (an essential — Title, Type, Problem/goal, Done-when — that cannot be inferred) or **non-blocking** (Priority, Base, Scope, Model, Pointers — which it infers and records under `## Assumptions`).
+2. On a blocking gap, the analyzer returns `needs_clarification` with a `questions[]` list already shaped as `AskUserQuestion` options, plus `draft_notes` on what it already figured out.
+3. You batch those questions into a single `AskUserQuestion` call (≤4 questions). Other analyzers keep running while you wait.
+4. You `SendMessage` the analyzer its answers. It resumes — no re-derivation — and writes the card, returning `card_written`.
+
+If the user does not answer, that request simply produces no card until they do. No board pollution, nothing stuck. Surface a brief "awaiting your answer on: <request>" line so the pending question is visible.
 
 ## Steps
 
-1. Determine the next number `NN`: scan `tasks/todo/`, `tasks/doing/`, and `tasks/done/` for filenames starting with digits, take the highest, add one, zero-pad to two (start at `01`). Create `tasks/todo/` if absent.
-2. Derive a short kebab-case `slug` from the title (a few words).
-3. Copy the template, fill the top half, and set the Timeline `created:` field to the current local time (`date '+%Y-%m-%d %H:%M'`). Leave `dispatched`, `agent finished`, `merged`, and the entire `## Handoff` blank — agents own those.
-4. Write to `tasks/todo/<NN>-<slug>.md`.
-5. Report the path and a one-line summary of the card.
-6. Ensure the board is running. The `kanban` orchestrator never self-terminates — it idle-polls `tasks/todo/` — so a card dropped here is picked up automatically by a running board. If a kanban loop is already active in this session, just note the card will be absorbed on its next poll. If none is running, start one by following `kanban/SKILL.md` directly (it sets `disable-model-invocation`, so read and run its control loop inline rather than via the Skill tool). Never start a second loop when one is already active — duplicate orchestrators race on `main`.
+1. For each pending request, dispatch an analyzer subagent on **Opus** (`model: "opus"`), passing the request text, a short `## Context` block of any directly relevant recent conversation, and the analyzer prompt from [references/analyzer-subagent.md](references/analyzer-subagent.md). Dispatch concurrent requests in one message.
+2. Route each return as above (`card_written` → acknowledge; `needs_clarification` → ask → `SendMessage` resume).
+3. Once at least one card exists, ensure the board is running. The `kanban` orchestrator never self-terminates — it idle-polls `tasks/todo/` — so a card dropped there is picked up automatically by a running board. If a kanban loop is already active in this session, just note the card will be absorbed on its next poll. If none is running, start one by following `kanban/SKILL.md` directly (it sets `disable-model-invocation`, so read and run its control loop inline rather than via the Skill tool). Never start a second loop when one is already active — duplicate orchestrators race on the base branches.
 
 ## Principles
 
-- One card, one unit of work. Split unrelated asks into separate cards rather than one sprawling card.
-- Acceptance criteria are testable statements, not a restatement of the title.
-- Write `Scope` concretely (ids, files, area) — it is the agent's first orientation.
+- One card, one unit of work. Split unrelated asks into separate cards (separate analyzers) rather than one sprawling card.
+- The card is a *navigation brief*, not a restatement of the request — that quality bar lives in the analyzer prompt; your job is to dispatch and route, not to second-guess its output.
+- Keep the user conversation tight: relay only genuine blocking questions, batched, never drip-asked.
 
 ## Anti-patterns
 
-- Filling Timeline beyond `created`, or writing anything under `## Handoff` — those are the execution agents' output, not creation input.
-- Renumbering or editing existing cards to make room — only ever add a new file.
-- Inventing evidence or pointers to fill placeholders — omit the section instead.
-- Padding the slug with the number or `.md`, or using spaces/underscores — kebab-case only.
+- Analyzing the request or writing a card yourself on the main agent — that re-serializes the queue this skill exists to parallelize.
+- Letting an analyzer ask the user directly (it cannot) or writing a half-finished card to the board to "hold" a question — questions stay in-context via the return/resume loop.
+- Re-dispatching a fresh analyzer to answer a clarification instead of resuming the suspended one with `SendMessage` — that throws away its exploration and repeats the work.
+- Starting a second kanban loop when one is already running.

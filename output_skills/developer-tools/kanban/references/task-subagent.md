@@ -1,22 +1,23 @@
 # Task subagent
 
-The prompt template the orchestrator hands to each task subagent. It runs on **Sonnet** in the background in its own git worktree (branch `kanban/<slug>` off `main`). Substitute the bracketed values.
+The prompt template the orchestrator hands to each task subagent. It runs on the **model named in the card's Model field** (default `opus`, dropping to `sonnet` only for trivial cards; an absent field defaults to `sonnet` for back-compat) in the background in its own git worktree (branch `kanban/<slug>` off the card's **Base** branch — often `main`, but a feature branch when the card targets one). Substitute the bracketed values.
 
-The card is the subagent's whole world — it was written by an Opus analysis pass precisely so a Sonnet agent can execute without re-deriving scope or hunting for entry points. The prompt below steers Sonnet to that brief, bounds its exploration, and holds it to the acceptance criteria.
+The card is the subagent's whole world — it was written by an Opus analysis pass precisely so the executor can act without re-deriving scope or hunting for entry points. The prompt below steers the agent to that brief, bounds its exploration, and holds it to the acceptance criteria.
 
 ## What to pass
 
-- `model: "sonnet"`.
+- `model:` the card's **Model** field (default `sonnet` if absent).
 - Absolute path to the task file (in `tasks/doing/`).
+- The card's **Base** branch (the branch the worktree was created from; the subagent never needs to merge into it, but state it so the agent knows its integration target).
 - The worktree path and branch (the harness sets these when `isolation: "worktree"`).
 
 ## Prompt
 
-> You are working task **[slug]** on Sonnet, in an isolated git worktree on branch `kanban/[slug]`. Everything you need is in the card at `[task-file-path]` — it was written for you to execute directly.
+> You are working task **[slug]**, in an isolated git worktree on branch `kanban/[slug]`, branched from `[base]` (the branch this work will be merged back into). Everything you need is in the card at `[task-file-path]` — it was written for you to execute directly.
 >
 > 1. Read the whole card first. **Scope** and **Pointers** are your map: open the files/areas they name before anything else, and treat **Done when** as the literal definition of finished. The card's top half is your spec — do not widen it.
 > 2. Stay inside the card's scope. If the listed pointers are enough, do not explore the rest of the repo; reach wider only when a pointer is wrong or insufficient, and note that gap in your handoff. Do the work entirely within this worktree.
-> 3. Commit your changes in the worktree with clear messages. Do not push, do not touch other branches, do not run merges.
+> 3. Commit your changes in the worktree with clear messages. Do not push, do not touch other branches, do not run merges. If a commit fails because 1Password blocks the signing prompt — it cannot be approved in this non-interactive background run — always retry the same commit with signing disabled (`--no-gpg-sign`, or `-c commit.gpgsign=false`). Defer to an unsigned commit rather than leaving the work uncommitted; only fall back after a block, never disable signing pre-emptively.
 > 4. Check your work against every **Done when** item before finishing.
 > 5. Write a handoff into the task file (see format below) so the merger can integrate your work and update the changelog.
 > 6. Stamp the task file's Timeline `agent finished:` field with the current local time (`date '+%Y-%m-%d %H:%M'`).
