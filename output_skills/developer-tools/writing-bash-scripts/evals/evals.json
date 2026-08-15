@@ -1,0 +1,55 @@
+{
+  "skill_name": "writing-bash-scripts",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I keep running out of disk space on my dev box. Write me a bash script called cleanup-logs that takes a directory and a number of days as arguments, and deletes all *.log files under that directory older than that many days. I want to see which files it deleted.",
+      "expected_output": "An executable bash script cleanup-logs that validates its two arguments, deletes old .log files with find, and prints what it deleted.",
+      "files": [],
+      "expectations": [
+        "The script file exists and is executable (test -x passes)",
+        "The first line is exactly '#!/usr/bin/env bash'",
+        "The script contains 'set -euo pipefail'",
+        "bash -n accepts the script (valid syntax)",
+        "shellcheck reports no issues (exit code 0)",
+        "Running the script with no arguments exits non-zero and prints usage to stderr",
+        "The script deletes only *.log files older than the given number of days (find with -mtime or equivalent)",
+        "The script prints the files it deleted",
+        "The script has no unnecessary comments or decorative echo output (at most 2 comment lines beyond the shebang)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "need a script to back up my ~/notes folder into ~/backups as a dated tar.gz (like notes-2026-07-06.tar.gz) and keep only the 5 newest backups. call it backup-notes",
+      "expected_output": "An executable bash script backup-notes that creates a date-stamped tar.gz of ~/notes in ~/backups and prunes all but the 5 newest archives.",
+      "files": [],
+      "expectations": [
+        "The script file exists and is executable (test -x passes)",
+        "The first line is exactly '#!/usr/bin/env bash'",
+        "The script contains 'set -euo pipefail'",
+        "bash -n accepts the script (valid syntax)",
+        "shellcheck reports no issues (exit code 0)",
+        "The archive filename embeds the current date (e.g. via date +%F)",
+        "The script removes older backups so only the 5 newest remain",
+        "The script does not pre-check for installed commands like tar (failure is obvious on use)",
+        "The script has no unnecessary comments or decorative echo output (at most 2 comment lines beyond the shebang)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "write a lil bash helper git-prune-merged that deletes local branches already merged into main, but never main/master or whatever branch im currently on",
+      "expected_output": "An executable bash script git-prune-merged that deletes local branches merged into main while protecting main, master, and the current branch.",
+      "files": [],
+      "expectations": [
+        "The script file exists and is executable (test -x passes)",
+        "The first line is exactly '#!/usr/bin/env bash'",
+        "The script contains 'set -euo pipefail'",
+        "bash -n accepts the script (valid syntax)",
+        "shellcheck reports no issues (exit code 0)",
+        "The script excludes main, master, and the current branch from deletion",
+        "In a test git repo with one merged and one unmerged branch, the script deletes only the merged branch",
+        "The script has no unnecessary comments or decorative echo output (at most 2 comment lines beyond the shebang)"
+      ]
+    }
+  ]
+}

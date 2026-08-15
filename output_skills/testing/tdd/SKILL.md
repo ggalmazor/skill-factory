@@ -58,23 +58,24 @@ STARTER_CHARACTER = 🔴 for red test, 🌱 for green, 🌀 when refactoring, al
 3. Think through the expected value BEFORE writing the assertion. Trace the logic step by step.
 4. Predict what will fail
 5. Run tests, see compilation error (if testing something new)
-6. Add minimal code to compile
+6. Add minimal code to compile — empty method bodies, placeholder returns, missing classes. Do not implement logic yet.
 7. Predict assertion failure
 8. Run tests, see assertion failure
 9. Add minimal code to pass
 10. Predict whether the tests will pass and why. Run tests, see green
-11. Simplify. For each line/expression you just added, ask: "Does a failing test require this?"
+11. If the test passed without ever being red, pause. Identify which earlier step added the code this test is exercising for free. Call it out (e.g., "This passed immediately because I added X at step N before a test required it"). Tighten discipline on remaining tests.
+12. Simplify. For each line/expression you just added, ask: "Does a failing test require this?"
     - If no test requires it, delete it or if it's necessary, add a test comment to write that test
     - Run tests after each simplification
     - Repeat until every line is justified by a test
-12. Refactor.
+13. Refactor.
     - Reflect on the domain: Is there a missing concept that would make the code more expressive? An object waiting to be extracted? A better way to model the problem?
     - You may introduce domain concepts (new abstractions) as long as you add NO new behavior. Tests must still pass, and there should be no new code added that doesn't have tests.
     - Think about improvements to expressiveness, clarity, simplicity
     - Say `🧹 Starting refactoring stage` and list planned refactorings
     - Implement one at a time, run tests after each
     - When done (or if none needed), say "🧹 Refactoring complete"
-13. Go to step 1 for the next [TEST] comment. Repeat until all planned tests are passing.
+14. Go to step 1 for the next [TEST] comment. Repeat until all planned tests are passing.
 
 ## Final Evaluation
 

@@ -1,0 +1,79 @@
+{
+  "skill_name": "tdd",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write a stack data structure in Python. It should support push, pop, and peek. Pop and peek on an empty stack should raise an error.",
+      "expected_output": "A Stack class with tests covering empty, one-item, and multi-item cases, built test-first with minimal code at each step",
+      "files": [],
+      "expectations": [
+        "Claude announces using TDD skill with mode at the start",
+        "Test plan is written as [TEST] comments before any implementation",
+        "ZOMBIES checklist is explicitly walked through to verify test completeness",
+        "Tests are written one at a time, not in batches",
+        "Each test is in given-when-then format with empty lines separating sections",
+        "Claude predicts the failure before running each test",
+        "The two-step red phase is followed: first compilation error, then assertion failure",
+        "Only minimal code is added to make each test pass — no speculative implementation",
+        "All tests are run after each change, not just the current one",
+        "A refactoring stage occurs after tests go green, announced with the refactoring emoji",
+        "Production code contains no comments",
+        "Final evaluation checks for missing tests and hardcoded values"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I need a function that converts Roman numerals to integers in TypeScript. Handle I through M, including subtractive notation like IV, IX, XL, etc.",
+      "expected_output": "A roman numeral converter built incrementally through TDD, starting with simplest cases and building up",
+      "files": [],
+      "expectations": [
+        "Claude announces using TDD skill with mode at the start",
+        "Test plan starts with the simplest case (single numeral) before complex ones",
+        "Tests progress from zero/one cases to many to boundary cases following ZOMBIES",
+        "Subtractive notation (IV, IX, XL, XC, CD, CM) is covered in the test plan",
+        "Each test is written before the code that makes it pass",
+        "Claude predicts failures before running tests",
+        "Implementation grows incrementally — no big-bang solution dropped in",
+        "Refactoring happens between test cycles when opportunities arise",
+        "Invalid input handling is deferred until happy paths work (ZOMBIES E-last principle)",
+        "Final code has no comments"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Build a simple shopping cart in Java. It should add items with a name and price, calculate the total, and apply a percentage discount. Don't worry about persistence.",
+      "expected_output": "A ShoppingCart class developed through strict TDD with comprehensive test coverage",
+      "files": [],
+      "expectations": [
+        "Claude announces using TDD skill with mode at the start",
+        "Test plan covers empty cart, single item, multiple items, and discount edge cases",
+        "The simplest test is tackled first (empty cart total is zero or similar)",
+        "Claude does not implement discount logic until a test demands it",
+        "Two-step red phase is visible: compilation error then assertion failure",
+        "Code is simplified after each green — Claude asks 'does a failing test require this?'",
+        "Domain concepts emerge through refactoring, not upfront design",
+        "All tests run after every change",
+        "Final evaluation reviews for missing edge cases"
+      ]
+    }
+    },
+    {
+      "id": 4,
+      "prompt": "Build a tennis game scorer in Python. Track points for two players. Use traditional tennis scoring (0, 15, 30, 40). Handle deuce (both at 40) and advantage rules. The game ends when a player wins. Provide a method that returns the current score as a string like '15-30' or 'Deuce' or 'Advantage Player 1' or 'Player 2 wins'.",
+      "expected_output": "A tennis scorer built through TDD with tests covering normal scoring, deuce, advantage, and win conditions",
+      "files": [],
+      "expectations": [
+        "Test plan covers normal scoring progression before deuce/advantage scenarios",
+        "ZOMBIES is walked through explicitly — zero (initial score), one (first point), many (multiple points), boundary (40-40 transition to deuce), exceptions (scoring after game is won)",
+        "Deuce logic is NOT implemented until a test forces it — early tests use hardcoded or simple score tracking",
+        "The transition from normal scoring to deuce scoring emerges through tests, not upfront design",
+        "Advantage and win-from-advantage are separate test cases, not lumped together",
+        "Claude predicts failures before running each test",
+        "A meaningful refactoring occurs — the scoring logic should evolve from simple to complex as tests demand it",
+        "Scoring after a game is won is handled (either raises error or is tested)",
+        "Final code correctly handles: normal points, deuce, advantage, win from advantage, win from 40-0/15/30",
+        "All tests run after every change"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "skill_name": "socratic-learning",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I want to actually understand how Kafka consumer group rebalancing works — not just a summary I'll forget tomorrow. I'm a backend dev, comfortable with distributed systems basics but I've never operated Kafka in production. Help me really learn it.",
+      "expected_output": "Claude facilitates a structured learning session: frames the goal and learner, gathers real sources, assesses current knowledge, then teaches Socratically one question at a time — rather than dumping an explanation.",
+      "files": [],
+      "expectations": [
+        "Claude does NOT open with a lecture or summary explaining how consumer group rebalancing works",
+        "Claude confirms or refines the learning goal and acknowledges the learner's stated background before teaching",
+        "Claude gathers or proposes gathering real source material (searches, papers, docs, talks) rather than teaching purely from its own memory",
+        "Claude runs or proposes an assessment of the learner's current knowledge before delivering teaching content",
+        "When teaching begins, Claude asks one question at a time and waits for an answer rather than posing several questions at once or answering its own question",
+        "Claude frames the interaction as a sustained, multi-step learning journey, not a single-response answer",
+        "The response is terse and low-noise: it opens with the 🦉 marker, with no warm-up flattery, no restating of the request, and no padding or long hedging",
+        "If the question offers the learner options to choose among, they are presented as a scannable bulleted list (one per line), not run together in a single prose sentence"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "(We're mid-session. Earlier you learned I'm a mid-level backend dev studying database indexing, and we agreed to go deep on when indexes actually help. You just asked me:)\n\n\"If a query filters on a column with very few distinct values — say a boolean `is_active` flag on a big users table — would adding a B-tree index on it speed the query up much? Why or why not?\"\n\nMy answer: \"Yeah, it'd help — the index lets the database jump straight to the matching rows instead of scanning the whole table.\"",
+      "expected_output": "Claude responds as a Socratic tutor mid-session: is direct that the conclusion is wrong (the index won't help for this low-selectivity case), credits the correct mechanism only as calibration, does not lecture the full answer, and pulls the why (low selectivity → planner skips the index) out of the learner with a single next question.",
+      "files": [],
+      "expectations": [
+        "Claude does NOT deliver a lecture or full explanation of index selectivity / cardinality — it does not just tell the learner the complete answer",
+        "Claude is direct that the learner's conclusion is wrong — it plainly signals that adding the index would NOT meaningfully speed up this query, rather than softening the verdict into 'not quite', a vague 'the part to pressure-test', or praise that buries the error. Crediting the correct mechanism (an index locates rows without a full scan) is fine, but as calibration, not as cushioning",
+        "After being direct that the conclusion is wrong, Claude pulls the WHY out of the learner with a pointed question (e.g. how many rows match, selectivity, cost of the row lookups) rather than lecturing the full explanation",
+        "The turn ends by handing control back to the learner with a single question, not with Claude's own exposition",
+        "Feedback is a few lines, not an essay",
+        "The response is terse and low-noise: it opens with just the 🦉 marker — this is a mid-session turn, not the session's first, so it does not re-announce the tutoring mode in words — with no warm-up flattery, no restating of the answer back, and no padding or long hedging",
+        "The response is scannable: short, plain-English chunks, and it uses a small ASCII diagram, table, or tight visual structure where that lands faster than prose — not one dense block of text"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Be my tutor for eventual consistency. Teach it to me.",
+      "expected_output": "Claude holds the Socratic discipline: no monologue, one question at a time, provokes the learner's thinking before revealing concepts, rather than lecturing.",
+      "files": [],
+      "expectations": [
+        "Claude does not respond with a monologue or lecture explaining eventual consistency",
+        "Claude hands the turn back to the learner — the response ends on a question or prompt for the learner, not on Claude's own explanation (multiple framing or clarifying questions are fine; answering its own question or lecturing is not)",
+        "Claude provokes the learner's own thinking first (asks what they know, poses a scenario, or offers an analogy to react to) before revealing the concept",
+        "Claude orients the session around finding out what the learner already knows before teaching new material",
+        "Claude stays in the questioning teacher role rather than sliding into delivering the full explanation unprompted",
+        "The response is terse and low-noise: it opens with the 🦉 marker, with no warm-up flattery, no restating of the request, and no padding or long hedging",
+        "If the question offers the learner options to choose among, they are presented as a scannable bulleted list (one per line), not run together in a single prose sentence"
+      ]
+    }
+  ]
+}

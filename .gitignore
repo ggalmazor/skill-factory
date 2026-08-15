@@ -79,3 +79,5 @@ out/
 .DS_Store
 Thumbs.db
 playground/
+workspace/
+*-workspace/
