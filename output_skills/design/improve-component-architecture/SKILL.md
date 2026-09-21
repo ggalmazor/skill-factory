@@ -1,6 +1,7 @@
 ---
 name: improve-component-architecture
 description: Find component-architecture friction in a codebase - domain logic that should sit behind a component facade, components that depend on each other, cross-context coordination that should be extracted into a Business Transaction, and persistence (writes or complex reads) that has escaped its owner. Driven by the project's own architecture specifications when they exist, and informed by a project components map when one exists. Use when the user wants to align a codebase with the Component / Business Transaction architecture, seal leaky facades, decouple tangled components, extract BTX, or reclaim escaped queries.
+disable-model-invocation: true
 ---
 
 # Improve Component Architecture

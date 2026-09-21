@@ -4,8 +4,8 @@ The prompt template for the merger. Exactly one merger runs at a time across the
 
 ## What to pass
 
-- `model: "sonnet"` — integration is mechanical and follows the handoff.
-- The task slug, branch (`kanban/<slug>`), the task's **Base** branch (the merge target), and worktree path.
+- `model: "haiku"` — integration is mechanical and follows the handoff.
+- The task slug, the worktree path, the branch **exactly as the harness reported it** (`worktree-<name>` — never a name built from the slug), and the task's **Base** branch (the merge target).
 - The card's **Verify** command, if it has one (the soundness gate the merger runs before finalizing).
 - Absolute path to the task file (in `tasks/doing/`).
 
@@ -16,7 +16,7 @@ The prompt template for the merger. Exactly one merger runs at a time across the
 > **Commit signing:** if any commit you make here (the merge commit, the changelog commit) fails because 1Password blocks the signing prompt — it cannot be approved in this non-interactive background run — always retry the same command with signing disabled (`--no-gpg-sign`, or `-c commit.gpgsign=false`). Defer to an unsigned commit rather than aborting the merge. Do not disable signing pre-emptively; only fall back after a block.
 >
 > 1. Read the `## Handoff` section of `[task-file-path]`.
-> 2. Check out `[base]` and merge branch `kanban/[slug]` into it.
+> 2. Check out `[base]` and merge branch `[branch]` into it. If that branch does not exist, do not guess a name from the slug — read the real one with `git -C [worktree-path] rev-parse --abbrev-ref HEAD` and merge that.
 > 3. **On conflict you cannot trivially resolve:** abort the merge (`git merge --abort`), leave the worktree intact, append a `## Merge blocked` note to the task file describing the conflicting paths and why, and report **conflict**. Do not force, do not guess a resolution. Stop here.
 > 4. **Verify gate (clean merge).** Before deleting anything, prove the merged base is sound:
 >    - If the card has a **Verify** command, run it from the base checkout.

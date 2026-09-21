@@ -1,12 +1,12 @@
 # Analyzer subagent
 
-The prompt and contract for the background **Opus** subagent that turns one request into a kanban card. The main agent (`kanban-task`) dispatches it with `model: "opus"`, passing the request text and a short `## Context` block of relevant conversation. The subagent owns the analysis; the main agent only routes its return.
+The prompt and contract for the background analyzer subagent that turns one request into a kanban card. The main agent (`kanban-task`) dispatches it on **Opus** (`model: "opus"`) by default, or on **Fable** (`model: "fable"`) for a demanding analysis, passing the request text and a short `## Context` block of relevant conversation. The subagent owns the analysis; the main agent only routes its return.
 
 The goal is not just a valid card — it is a **navigation brief** good enough that the executing agent can act on it without re-deriving scope or hunting for entry points. Front-load that work now, on the strong model. If you must explore the repo to write concrete pointers, do it before writing the card.
 
 ## What to pass
 
-- `model: "opus"`.
+- `model: "opus"` by default; `model: "fable"` only for a demanding analysis (the router picks — see `kanban-task/SKILL.md`).
 - The request text (the user's ask).
 - A `## Context` block: any directly relevant recent conversation. The subagent does not inherit the main conversation, so this is its only conversational context — but it explores the repo itself for everything code-related.
 - The prompt below.
@@ -29,7 +29,9 @@ The goal is not just a valid card — it is a **navigation brief** good enough t
 >
 > **Base** is the branch the work integrates into — the orchestrator branches the task's worktree off it and the merger merges back into it. Default it to the branch checked out now (`git rev-parse --abbrev-ref HEAD`); this lets a card created on a feature branch ship to that feature branch instead of `main`. Override only when the user named a target branch. If HEAD is detached, fall back to `main`.
 >
-> **Model** is the model the executor runs on. **Default `opus`** — the board favors speed and one-shot completion over token economy, and a stronger executor means fewer blocked or conflicted tasks and fewer human round-trips. Set `sonnet` **only when the task is genuinely trivial**: single-file, mechanical, fully-specified pointers, no design latitude (e.g. a rename, a constant change, a copy tweak). When in doubt, `opus`.
+> **Model** is the model the executor runs on, and the board favors **token economy**. **Default `haiku`** — mechanical or well-specified work: a rename, a constant change, a copy tweak, a localized edit whose pointers you have nailed down. Step up to `sonnet` when the work needs judgement the card cannot fully specify: several files, a pattern to follow rather than a literal edit, or tests to shape. Reserve `opus` for genuinely hard work — real design latitude, wide blast radius, tricky debugging, or a change whose shape you could not pin down yourself. `opus` is the exception, never a default. The better your Pointers and Done-when, the cheaper the model that can execute the card: invest in the brief instead of in the executor.
+>
+> A card you cannot brief well enough for `haiku` or `sonnet` is usually a card that should be split, not escalated.
 >
 > **Verify** is the command the merger runs as a hard gate to prove the merged result builds before it deletes the worktree. You are already in the repo — determine the project's fast soundness check and set it: e.g. `./gradlew compileJava compileTestJava` for Gradle/Java, `npm test` or `npm run build` for Node, `cargo build` for Rust, `pytest` for Python. Prefer the quickest check that would catch a broken merge (compile over full test suite if the suite is slow). If the project has no obvious check, omit the field — the merger will try to discover one itself, and skip the gate if none exists.
 >
@@ -51,7 +53,7 @@ The final message is your return value (not human-facing). Return exactly one ve
 status: card_written
 card_path: tasks/todo/<NN>-<slug>.md
 summary: <one line on what the card asks for>
-model: <opus | sonnet>
+model: <haiku | sonnet | opus>
 assumptions: <bullet list, or "none">
 ```
 
@@ -76,5 +78,5 @@ When the main agent resumes you (via `SendMessage`) with the answers, finish the
 - Filling Timeline beyond `created`, or writing anything under `## Handoff` — those are the execution agents' output.
 - Renumbering or editing existing cards to make room — only ever add a new file.
 - Inventing evidence or pointers to fill placeholders — omit the section instead.
-- Defaulting Model to `sonnet` to save tokens — the policy is the opposite; `sonnet` is the rare trivial-task exception.
+- Reaching for `opus` on Model because the card feels big — `opus` is for genuinely hard work; a big-but-clear card is a `haiku` or `sonnet` card with a good brief, or two cards.
 - Padding the slug with the number or `.md`, or using spaces/underscores — kebab-case only.

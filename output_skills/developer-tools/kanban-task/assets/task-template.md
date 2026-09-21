@@ -11,7 +11,7 @@
 **Type:** bug | feature | chore
 **Priority:** high | normal | low
 **Base:** <branch this work integrates into — the task worktree branches off it and the merger merges back into it; defaults to the branch checked out when the card was created>
-**Model:** opus | sonnet  <!-- the executor's model. Default opus (favor speed / one-shot completion); use sonnet only for genuinely trivial, single-file, fully-specified work. Absent ⇒ the orchestrator defaults to sonnet for back-compat. -->
+**Model:** haiku | sonnet | opus  <!-- the executor's model. Default haiku (favor token economy); sonnet when the work needs judgement the card cannot fully specify; opus only for genuinely hard work — real design latitude, wide blast radius, tricky debugging. Absent ⇒ the orchestrator defaults to haiku for back-compat. -->
 **Verify:** <command(s) that prove the merged result is sound — compile/build/test, e.g. `./gradlew compileJava compileTestJava` or `npm test`. The merger runs this as a hard gate before deleting the worktree; on failure it rolls the merge back and blocks. Omit if the project has no quick check — the merger will then try to discover one.>
 **Scope:** <source id(s) and/or area — e.g. "source 11", "source-list UI", "all XLSX extractors">
 
@@ -25,7 +25,7 @@
 <Observed vs expected. Paste any error text / stack trace. Repro steps. Screenshot path.>
 
 ## Pointers  (optional)
-<The executing (Sonnet) agent's map. Name concrete files AND entry points within them — path, function/class, why it's relevant — the pattern or sibling code to mirror, related prior work, and constraints that bound the change. Prefer "src/extractors/xlsx.py — extract_rows(), drops empty cells" over "the extractor code".>
+<The executing agent's map — assume it is a cheap model working from this card alone. Name concrete files AND entry points within them — path, function/class, why it's relevant — the pattern or sibling code to mirror, related prior work, and constraints that bound the change. Prefer "src/extractors/xlsx.py — extract_rows(), drops empty cells" over "the extractor code".>
 
 ## Done when
 <Acceptance criteria — how we confirm it's fixed/built.>
